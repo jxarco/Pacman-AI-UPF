@@ -80,23 +80,147 @@ def depthFirstSearch(problem):
     goal. Make sure to implement a graph search algorithm.
 
     To get started, you might want to try some of these simple commands to
-    understand the search problem that is being passed in:
+    understand the search problem that is being passed in:""
 
     print "Start:", problem.getStartState()
     print "Is the start a goal?", problem.isGoalState(problem.getStartState())
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    """ DFS -> Stack  """
+    stack = util.Stack()
+    close = set()
+    """ pathToGoal will store path data """
+    pathToGoal = []
+    startState = problem.getStartState()
+    """
+    Creating a node from a state (With no action, no cost, and no parent)
+    """
+    startNode = startState, '', 0, None
+    stack.push( startNode )
+
+    while not stack.isEmpty():
+        # Take out last element inserted in the stack
+        current = stack.pop()
+        if problem.isGoalState( current[0] ):
+            """ Backtracking to get the full path """
+            while current[3] != None:
+                # Add action
+                pathToGoal.append( current[1] )
+                # Update node to get next parent
+                current = current[3]
+                """ [::-1 to get the reverse path] """
+            return pathToGoal[::-1]
+        else:
+            if current[0] not in close:
+                close.add( current[0] )
+                # Get successors of current state
+                successors = problem.getSuccessors( current[0] )
+                for s in successors:
+                    node = s
+                    # Adding parent to the tuple
+                    node = node + (current, )
+                    # Add successors to the stack
+                    stack.push(node)
+            else:
+                # If not, we do not have to expand again
+                continue
+        
     util.raiseNotDefined()
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
+    """ BFS -> Queue  """
+    queue = util.Queue()
+    """ If we use a set() we can not use NOT IN in corners problem """
+    close = []
+    """ pathToGoal will store path data """
+    pathToGoal = []
+    startState = problem.getStartState()
+    """
+    Creating a node from a state (With no action, no cost, and no parent)
+    """
+    startNode = startState, '', 0, None
+    queue.push( startNode )
+
+    while not queue.isEmpty():
+        # Take out first element in the queue
+        current = queue.pop()
+        if problem.isGoalState( current[0] ):
+            """ Backtracking to get the full path """
+            while current[3] != None:
+                # Add action
+                pathToGoal.append( current[1] )
+                # Update node to get next parent
+                current = current[3]
+                """ [::-1 to get the reverse path] """
+            return pathToGoal[::-1]
+        else:
+            if current[0] not in close:
+                close.append( current[0] )
+                # Get successors of current state
+                successors = problem.getSuccessors( current[0] )
+                for s in successors:
+                    node = s
+                    # Adding parent to the tuple
+                    node = node + (current, )
+                    # Add successors to the queue
+                    queue.push(node)
+            else:
+                # If not, we do not have to expand again
+                continue
     util.raiseNotDefined()
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
+    p_queue = util.PriorityQueue()
+    close = set()
+    """ pathToGoal will store path data """
+    pathToGoal = []
+    startState = problem.getStartState()
+    """
+    Creating a node from a state (With no action, no cost, and no parent)
+    """
+    startNode = startState, '', 0, None
+    p_queue.push( startNode, 0)
+
+    while not p_queue.isEmpty():
+        current = p_queue.pop()
+        if problem.isGoalState( current[0] ):
+            """ Backtracking to get the full path """
+            while current[3] != None:
+                # Add action
+                pathToGoal.append( current[1] )
+                # Update node to get next parent
+                current = current[3]
+                """ [::-1 to get the reverse path] """
+            return pathToGoal[::-1]
+        else:
+            if current[0] not in close:
+                close.add( current[0] )
+                # Get successors of current state
+                successors = problem.getSuccessors( current[0] )
+                for s in successors:
+                    node = s
+                    """ Adding parent to the tuple """
+                    node = node + (current, )
+                    """ Using aux_node to do the backtracking """
+                    aux_node = node
+                    count = aux_node[2]
+                    """
+                    The next while will calculate f(n) = priority in the QUEUE
+                    doing the backtracking
+                    """
+                    while aux_node[3] != None:
+                        aux_node = aux_node[3]
+                        count += aux_node[2]
+                    # Add node to the priority queue
+                    p_queue.push(node, count)
+            else:
+                # If not, we do not have to expand again
+                continue
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -109,8 +233,53 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    p_queue = util.PriorityQueue()
+    close = []
+    """ pathToGoal will store path data """
+    pathToGoal = []
+    startState = problem.getStartState()
+    """
+    Creating a node from a state (With no action, no cost, and no parent)
+    """
+    startNode = startState, '', 0, None
+    p_queue.push( startNode, 0)
 
+    while not p_queue.isEmpty():
+        current = p_queue.pop()
+        if problem.isGoalState( current[0] ):
+            """ Backtracking to get the full path """
+            while current[3] != None:
+                # Add action
+                pathToGoal.append( current[1] )
+                # Update node to get next parent
+                current = current[3]
+                """ [::-1 to get the reverse path] """
+            return pathToGoal[::-1]
+        else:
+            if current[0] not in close:
+                close.append( current[0] )
+                # Get successors of current state
+                successors = problem.getSuccessors( current[0] )
+                for s in successors:
+                    node = s
+                    """ Adding parent to the tuple """
+                    node = node + (current, )
+                    """ Using aux_node to do the backtracking """
+                    aux_node = node
+                    count = aux_node[2]
+                    """
+                    The next while will calculate f(n) = priority in the QUEUE
+                    doing the backtracking
+                    """
+                    while aux_node[3] != None:
+                        aux_node = aux_node[3]
+                        count += aux_node[2]
+                    """ Only difference is the sum of the heuristic """
+                    p_queue.push(node, count + heuristic(node[0], problem))
+            else:
+                # If not, we do not have to expand again
+                continue
+    util.raiseNotDefined()
 
 # Abbreviations
 bfs = breadthFirstSearch
