@@ -75,35 +75,29 @@ class ReflexAgent(Agent):
 
         "*** YOUR CODE HERE ***"
 
-        score =     -1000000
-        dist =       1000000
+        newFoodList = newFood.asList();
+        oldFoodList = newFood.asList();
+        score = 0
 
-        """ Taking foods as lists """
-        newFoodList = newFood.asList()
-        oldFoodList = currentGameState.getFood().asList()
-
-        # If PACMAN stops:
-        if action == 'Stop':
-          return score
-
-        # If new state is food:
-        if len(newFoodList) < len(oldFoodList):
-          score += 500
-
-        # If PACMAN find the ghost
-        ghostDistance = manhattanDistance(successorGameState.getGhostPosition(1), newPos)
-        score += max(2, ghostDistance)
-
-        dist = 1000000
-        for food in newFoodList:
-          dist = min(dist, manhattanDistance(food, newPos))
-          
-        score -= dist * 10 
+        # Lists with distances to foods and ghosts
+        foodDist = [manhattanDistance(food, newPos) for food in newFoodList]
+        ghostDist = [manhattanDistance(newPos, ghost.getPosition()) for ghost in newGhostStates]
 
         if successorGameState.isWin():
-          score += 1000000
+          return 10000000
 
-        return score
+        if action == 'Stop':
+            return -10000000
+
+        for oneGhostDist in ghostDist:
+           if oneGhostDist < 4:
+                return -10000000
+
+        #if len(newFoodList) < len(oldFoodList):
+        score += len(newFoodList) * 1000000
+
+        return score + sum(foodDist) * 1000
+        #return len(newFoodList) * 10 + sum(foodDist)
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
