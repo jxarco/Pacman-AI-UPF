@@ -67,20 +67,43 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
-        successorGameState = currentGameState.generatePacmanSuccessor(action)
+        successorGameState = currentGameState.generatePacmanSuccessor(action) # SUCCESSOR STATE
         newPos = successorGameState.getPacmanPosition() # POS X,Y
         newFood = successorGameState.getFood() # FOOD GRID (TRUE/FALSE)
-        newGhostStates = successorGameState.getGhostStates()
+        newGhostStates = successorGameState.getGhostStates() # WHERE ARE GHOSTS
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
 
-        """ Taking food as list to  """
-        #foodList = newFood.asList()
+        score =     -1000000
+        dist =       1000000
 
+        """ Taking foods as lists """
+        newFoodList = newFood.asList()
+        oldFoodList = currentGameState.getFood().asList()
 
+        # If PACMAN stops:
+        if action == 'Stop':
+          return score
 
-        #print "state:", successorGameState
+        # If new state is food:
+        if len(newFoodList) < len(oldFoodList):
+          score += 500
+
+        # If PACMAN find the ghost
+        ghostDistance = manhattanDistance(successorGameState.getGhostPosition(1), newPos)
+        score += max(2, ghostDistance)
+
+        dist = 1000000
+        for food in newFoodList:
+          dist = min(dist, manhattanDistance(food, newPos))
+          
+        score -= dist * 10 
+
+        if successorGameState.isWin():
+          score += 1000000
+
+        return score
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
