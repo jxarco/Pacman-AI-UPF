@@ -144,10 +144,10 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
           """ If game is finished """
           if gameState.isWin() or gameState.isLose():
-            return gameState.getScore()
+            return self.evaluationFunction(gameState)
 
           # Initialize best action and score
-          # v = -∞ in max
+          # v = -INF in max
           bestAction = None
           bestScore = float("-inf")
 
@@ -172,27 +172,27 @@ class MinimaxAgent(MultiAgentSearchAgent):
         def minAgent(gameState, depth, ghost):
 
           if gameState.isWin() or gameState.isLose():
-            return gameState.getScore()
+            return self.evaluationFunction(gameState)
 
           # Initialize score
-          # v = ∞ in min
+          # v = INF in min
           bestScore = float("inf")
           # Legal actions for selected ghost
           legalActions = gameState.getLegalActions(ghost)
           
           for action in legalActions:
             successorGameState = gameState.generateSuccessor(ghost, action)
-            # Last ghost -> next turn is for pacman
-            if(ghost == NG):
+            if(ghost < NG):
+              # There are still ghosts to move
+              # Using ghost + 1 to select the next ghost
+              v = minAgent(successorGameState, depth, ghost + 1) # returns a score
+            else:
+              # Last ghost -> next turn is for pacman
               if(depth == self.depth - 1): # IF IT IS A TERMINAL
                 v = self.evaluationFunction(successorGameState)
               else:
-                # If it is not a terminal -> turn for max
+                # If it is not a terminal
                 v = maxAgent(successorGameState, depth + 1) # returns a score
-            # There are still ghosts to move
-            # Using ghost + 1 to select the next ghost
-            else:
-              v = minAgent(successorGameState, depth, ghost + 1) # returns a score
             
             # Update best min score
             bestScore = min(v, bestScore)
@@ -200,7 +200,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
           return bestScore
 
 
-        # ACTION
+        # RETURN AN ACTION
         return maxAgent(gameState, 0) # depth = 0
 
         util.raiseNotDefined()
