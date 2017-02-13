@@ -68,12 +68,19 @@ class ReflexAgent(Agent):
         """
         # Useful information you can extract from a GameState (pacman.py)
         successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
+        newPos = successorGameState.getPacmanPosition() # POS X,Y
+        newFood = successorGameState.getFood() # FOOD GRID (TRUE/FALSE)
         newGhostStates = successorGameState.getGhostStates()
         newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
         "*** YOUR CODE HERE ***"
+
+        """ Taking food as list to  """
+        #foodList = newFood.asList()
+
+
+
+        #print "state:", successorGameState
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
@@ -129,6 +136,73 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+
+        """ Number of ghosts in game """
+        NG = gameState.getNumAgents() - 1
+
+        def maxAgent(gameState, depth):
+
+          """ If game is finished """
+          if gameState.isWin() or gameState.isLose():
+            return gameState.getScore()
+
+          # Initialize best action and score
+          # v = -∞ in max
+          bestAction = None
+          bestScore = float("-inf")
+
+          legalActions = gameState.getLegalActions(0) # 0 is the index for pacman
+          
+          """ For each action we have to obtain max score of min movements """
+          for action in legalActions:
+            successorGameState = gameState.generateSuccessor(0, action)
+            v = minAgent(successorGameState, depth, 1)
+            # Update best max score
+            if(v > bestScore):
+              bestScore = v
+              bestAction = action
+
+          # Recursive calls have finished -> depth = initial depth -> return best action
+          if depth == 0:
+            return bestAction
+          # We are in different depth, we need to return a score
+          else:
+            return bestScore
+
+        def minAgent(gameState, depth, ghost):
+
+          if gameState.isWin() or gameState.isLose():
+            return gameState.getScore()
+
+          # Initialize score
+          # v = ∞ in min
+          bestScore = float("inf")
+          # Legal actions for selected ghost
+          legalActions = gameState.getLegalActions(ghost)
+          
+          for action in legalActions:
+            successorGameState = gameState.generateSuccessor(ghost, action)
+            # Last ghost -> next turn is for pacman
+            if(ghost == NG):
+              if(depth == self.depth - 1): # IF IT IS A TERMINAL
+                v = self.evaluationFunction(successorGameState)
+              else:
+                # If it is not a terminal -> turn for max
+                v = maxAgent(successorGameState, depth + 1) # returns a score
+            # There are still ghosts to move
+            # Using ghost + 1 to select the next ghost
+            else:
+              v = minAgent(successorGameState, depth, ghost + 1) # returns a score
+            
+            # Update best min score
+            bestScore = min(v, bestScore)
+
+          return bestScore
+
+
+        # ACTION
+        return maxAgent(gameState, 0) # depth = 0
+
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
