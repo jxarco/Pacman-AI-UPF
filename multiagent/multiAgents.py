@@ -76,28 +76,41 @@ class ReflexAgent(Agent):
         "*** YOUR CODE HERE ***"
 
         newFoodList = newFood.asList();
-        oldFoodList = newFood.asList();
+        oldFoodList = currentGameState.getFood().asList();
         score = 0
+        minfood = 99999999
+
+        oldCapsules = currentGameState.getCapsules();
+        newCapsules = successorGameState.getCapsules();
 
         # Lists with distances to foods and ghosts
         foodDist = [manhattanDistance(food, newPos) for food in newFoodList]
         ghostDist = [manhattanDistance(newPos, ghost.getPosition()) for ghost in newGhostStates]
 
+        if(len(newFoodList) < len(oldFoodList)):
+          score += 1000
+
+        if(len(newCapsules) < len(oldCapsules)):
+          score += 1000
+
         if successorGameState.isWin():
-          return 10000000
+          return 1000000
 
         if action == 'Stop':
-            return -10000000
+          score -= 100
 
         for oneGhostDist in ghostDist:
-           if oneGhostDist < 4:
-                return -10000000
+          if oneGhostDist < 4:
+            score -= 1000000
 
-        #if len(newFoodList) < len(oldFoodList):
-        score += len(newFoodList) * 1000000
+        for oneFoodDist in foodDist:
+          if oneFoodDist < minfood:
+            minfood = oneFoodDist
 
-        return score + sum(foodDist) * 1000
-        #return len(newFoodList) * 10 + sum(foodDist)
+        score += 10000 - minfood
+
+
+        return score
         return successorGameState.getScore()
 
 def scoreEvaluationFunction(currentGameState):
@@ -324,6 +337,72 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
+        
+        """ Number of ghosts in game """
+        NG = gameState.getNumAgents() - 1
+
+        def maxAgent(gameState, depth):
+
+          """ If game is finished """
+          if gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+
+          # Initialize best action and score
+          # v = -INF in max
+          bestAction = None
+          bestScore = float("-inf")
+
+          legalActions = gameState.getLegalActions(0) # 0 is the index for pacman
+          
+          """ For each action we have to obtain max score of min movements """
+          for action in legalActions:
+            successorGameState = gameState.generateSuccessor(0, action)
+            v = minAgent(successorGameState, depth, 1)
+            # Update best max score
+            if(v > bestScore):
+              bestScore = v
+              bestAction = action
+
+          # Recursive calls have finished -> depth = initial depth -> return best action
+          if depth == 0:
+            return bestAction
+          # We are in different depth, we need to return a score
+          else:
+            return bestScore
+
+        def minAgent(gameState, depth, ghost):
+
+          if gameState.isWin() or gameState.isLose():
+            return self.evaluationFunction(gameState)
+
+          # Initialize score
+          # v = INF in min
+          bestScore = float("inf")
+          # Legal actions for selected ghost
+          legalActions = gameState.getLegalActions(ghost)
+          
+          for action in legalActions:
+            successorGameState = gameState.generateSuccessor(ghost, action)
+            if(ghost < NG):
+              # There are still ghosts to move
+              # Using ghost + 1 to select the next ghost
+              v = minAgent(successorGameState, depth, ghost + 1) # returns a score
+            else:
+              # Last ghost -> next turn is for pacman
+              if(depth == self.depth - 1): # IF IT IS A TERMINAL
+                v = self.evaluationFunction(successorGameState)
+              else:
+                # If it is not a terminal
+                v = maxAgent(successorGameState, depth + 1) # returns a score
+            
+            # Update best min score
+            bestScore = min(v, bestScore)
+
+          return bestScore
+
+
+        # RETURN AN ACTION
+        return maxAgent(gameState, 0) # depth = 0
         util.raiseNotDefined()
 
 def betterEvaluationFunction(currentGameState):
