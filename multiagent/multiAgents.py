@@ -75,11 +75,15 @@ class ReflexAgent(Agent):
 
         "*** YOUR CODE HERE ***"
 
+        # Food lists to see if PACMAN eats food in new successor
         newFoodList = newFood.asList();
         oldFoodList = currentGameState.getFood().asList();
+
+        # score counter
         score = 0
         minfood = 99999999
 
+        # Capsules number to see if PACMAN eats a capsule in new successor
         oldCapsules = currentGameState.getCapsules();
         newCapsules = successorGameState.getCapsules();
 
@@ -87,22 +91,31 @@ class ReflexAgent(Agent):
         foodDist = [manhattanDistance(food, newPos) for food in newFoodList]
         ghostDist = [manhattanDistance(newPos, ghost.getPosition()) for ghost in newGhostStates]
 
+        # PACMAN EATS FOOD -> INCREASE SCORE
         if(len(newFoodList) < len(oldFoodList)):
           score += 1000
 
+        # PACMAN EATS CAPSULE -> INCREASE SCORE
         if(len(newCapsules) < len(oldCapsules)):
           score += 1000
 
+        # PACMAN WINS -> RETURN MAX SCORE -> BEST ACTION
         if successorGameState.isWin():
           return 1000000
 
+        # PACMAN STOPS -> DECREASE SCORE
         if action == 'Stop':
           score -= 100
 
+        # IF PACMAN IS TOO CLOSE TO A GHOST -> DECREASE SCORE
+        # DECREASE A LOT -> NOT TO LOSE IT IS IMPORTANT
         for oneGhostDist in ghostDist:
           if oneGhostDist < 4:
             score -= 1000000
 
+        # CALCULATE CLOSEST FOOD
+        # INCREASE SCORE IN 10000 - DISTANCE TO CLOSEST FOOD
+        # CLOSER -> MORE SCORE
         for oneFoodDist in foodDist:
           if oneFoodDist < minfood:
             minfood = oneFoodDist
@@ -110,6 +123,7 @@ class ReflexAgent(Agent):
         score += 10000 - minfood
 
 
+        # RETURN TOTAL SCORE
         return score
         return successorGameState.getScore()
 
@@ -337,7 +351,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-        
+
         """ Number of ghosts in game """
         NG = gameState.getNumAgents() - 1
 
@@ -345,6 +359,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
           """ If game is finished """
           if gameState.isWin() or gameState.isLose():
+            #print "MAX: voy a sacar un,", self.evaluationFunction(gameState)
             return self.evaluationFunction(gameState)
 
           # Initialize best action and score
@@ -368,16 +383,19 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             return bestAction
           # We are in different depth, we need to return a score
           else:
+            #print "bestScore devuelto por MAX: ", bestScore
             return bestScore
 
         def minAgent(gameState, depth, ghost):
 
           if gameState.isWin() or gameState.isLose():
+            #print "voy a sacar un,", self.evaluationFunction(gameState)
             return self.evaluationFunction(gameState)
 
           # Initialize score
           # v = INF in min
           bestScore = float("inf")
+          average = 0.0
           # Legal actions for selected ghost
           legalActions = gameState.getLegalActions(ghost)
           
@@ -390,14 +408,17 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             else:
               # Last ghost -> next turn is for pacman
               if(depth == self.depth - 1): # IF IT IS A TERMINAL
+                #print "voy a sacar un,", self.evaluationFunction(gameState)
                 v = self.evaluationFunction(successorGameState)
+                average += v
               else:
                 # If it is not a terminal
                 v = maxAgent(successorGameState, depth + 1) # returns a score
+                average += v
             
-            # Update best min score
-            bestScore = min(v, bestScore)
-
+          # Update average score
+          bestScore = average / float(len(legalActions))
+          #print "bestScore devuelto por MIN: ", bestScore
           return bestScore
 
 
