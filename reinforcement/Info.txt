@@ -1,0 +1,62 @@
+*****************************************************************
+MDP:
+
+-S espacio de estados
+-S0
+-G
+-A(s)
+-Pa(s'|s) --> Probabilidad de que de un estado s vayamos a s'
+-C(a, s)
+
+*****************************************************************
+
+Reward MDP:
+
+Lo mismo hasta Policy
+-r(a.s)
+-discount factor (contra más tardemos en llegar al goal, más reward nos resta)
+
+***************************************************
+* Policy --> Qué acciones hacemos en cada estado  * 
+***************************************************
+
+
+**************************************************************
+*  Vi+1 = max Sum(Pa(s'|s)*[r(s,a) + discount factorVi(s'))] *
+**************************************************************
+
+V*(s) = maxQ(s,a) V es valor optimo
+
+Qvalue(s,a) = [Sum(Pa(s'|s)*[r(s,a) + discount factorVi(s'))] --> Q es el valor optimo de haber aplicado una accion en un estado
+
+Empezamos:
+
+1- V0(s) = 0
+
+
+Q-learning
+
+********************************************************
+Q(s,a) = (1- alpha)*Q(s,a) + alpha[r(a,s) + lmaxQ(s,a)]*
+********************************************************
+
+learning rate (la parte de 1-alpha y alpha)
+	--> Def: con cuanta info de cada iteracion nos quedamos, si es 1 solo nos quedamos con el ultimo valor (el anterior)
+	Si es 0 no se queda con nada
+	Con 0 va más rapido/ Con 1 va más lento
+	Tenemos que jugar con este parametro y ver como varia el Qvalue
+
+En la Q4 deberemos aplicar la formula
+
+Epsilon Greedy
+
+Las acciones se basan en un parametro epsilon (una probabilidad)
+
+Q6 es igual que la 2 pero Con el algoritmo de la Q4
+
+Q7 todo lo que tenemos aplicado a Pacman
+
+
+
+
+
