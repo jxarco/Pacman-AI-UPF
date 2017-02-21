@@ -46,7 +46,8 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
 
-        
+        for i in range(iteration):
+          
 
 
     def getValue(self, state):
