@@ -46,6 +46,8 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
 
+        
+
 
     def getValue(self, state):
         """
@@ -60,6 +62,19 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
+        # Qvalue(s,a) = [Sum(Pa(s'|s)*[r(s,a) + (discount * factorVi(s'))]
+
+        Qvalue = 0
+
+        # Esta nos da el estado y la pa.
+        states = self.mdp.getTransitionStatesAndProbs(state, action)
+
+        for nextState, pa in states:
+          reward = self.mdp.getReward(state, action, nextState)
+          Qvalue +=  pa * reward + (self.discount * self.values[nextState])
+
+        return Qvalue
+
         util.raiseNotDefined()
 
     def computeActionFromValues(self, state):
@@ -72,6 +87,25 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+
+        actions = self.mdp.getPossibleActions(state)
+
+        if len(actions) == 0:
+          return None
+
+        # Choose the best action
+
+        Qvalues = [self.computeQValueFromValues(state, action) for action in actions]
+        bestQvalue = max(Qvalues)
+        bestQIndex = [index for index in range(len(Qvalues)) if Qvalues[index] == bestQvalue]
+
+        # bestQIndex contains the max values: could be more than one, so:
+
+        # We get the first
+        index = bestQIndex[0]
+          
+        return actions[index]
+
         util.raiseNotDefined()
 
     def getPolicy(self, state):
