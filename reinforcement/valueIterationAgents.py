@@ -46,9 +46,20 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
 
-        for i in range(iteration):
-          
+        for i in range(iterations):
 
+          updatedValues = self.values.copy()
+
+          for state in self.mdp.getStates():
+            v_max = None
+            for action in self.mdp.getPossibleActions(state):
+              v = self.computeQValueFromValues(state, action)
+              v_max = max( v, v_max )
+            if self.mdp.isTerminal(state):
+              v_max = 0
+
+            updatedValues[state] = v_max
+          self.values = updatedValues
 
     def getValue(self, state):
         """
@@ -72,7 +83,7 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         for nextState, pa in states:
           reward = self.mdp.getReward(state, action, nextState)
-          Qvalue +=  pa * reward + (self.discount * self.values[nextState])
+          Qvalue +=  pa * (reward + (self.discount * self.values[nextState]))
 
         return Qvalue
 
