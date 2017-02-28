@@ -148,12 +148,12 @@ class QLearningAgent(ReinforcementAgent):
         # QUESTION 4
 
         #*********************************************************
-        #*Q(s,a) = (1- alpha)*Q(s,a) + alpha[r(a,s) + lmaxQ(s,a)]*
+        #*Q(s,a) = (1- alpha)*Q(s,a) + alpha[r(a,s) + disc * lmaxQ(s,a)]*
         #*********************************************************
 
         node = (state, action)
 
-        self.Qvalues[node] = ( 1 - self.alpha ) * self.getQValue(state, action) + self.alpha * ( reward + self.discount + self.computeValueFromQValues(nextState))
+        self.Qvalues[node] = ( 1 - self.alpha ) * self.getQValue(state, action) + self.alpha * ( reward + self.discount * self.computeValueFromQValues(nextState))
 
 
     def getPolicy(self, state):
