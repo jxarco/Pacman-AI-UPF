@@ -59,7 +59,7 @@ class QLearningAgent(ReinforcementAgent):
 
         if node not in self.Qvalues:
           return 0.0
-
+        
         return self.Qvalues[node]
 
         util.raiseNotDefined()
@@ -81,15 +81,10 @@ class QLearningAgent(ReinforcementAgent):
           return 0.0
 
         # Choose the best Qvalue
-        Qvalues = []
-
-        for action in actions:
-          Qvalues.append( self.getQValue(state, action) )
-        
-        bestQvalue = max(Qvalues)
+        q_values = [self.getQValue(state, action) for action in actions]
+        bestQvalue = max(q_values)
           
         return bestQvalue
-        return 0
 
         util.raiseNotDefined()
 
@@ -109,12 +104,11 @@ class QLearningAgent(ReinforcementAgent):
 
         # Choose the best action
 
-        Qvalues = [self.getQValue(state, action) for action in actions]
-        bestQvalue = max(Qvalues)
-        bestQIndex = [index for index in range(len(Qvalues)) if Qvalues[index] == bestQvalue]
+        q_values = [self.getQValue(state, action) for action in actions]
+        bestQvalue = max(q_values)
+        bestQIndex = [index for index in range(len(q_values)) if q_values[index] == bestQvalue]
 
         # bestQIndex contains the max values: could be more than one, so:
-
         # We get the first
         index = bestQIndex[0]
           
@@ -157,7 +151,9 @@ class QLearningAgent(ReinforcementAgent):
         #*Q(s,a) = (1- alpha)*Q(s,a) + alpha[r(a,s) + lmaxQ(s,a)]*
         #*********************************************************
 
-        self.Qvalues = ( 1 - self.alpha ) * self.getQValue(state, action) + self.alpha * ( reward + self.computeValueFromQValues(nextState) )
+        node = (state, action)
+
+        self.Qvalues[node] = ( 1 - self.alpha ) * self.getQValue(state, action) + self.alpha * ( reward + self.discount + self.computeValueFromQValues(nextState))
 
 
     def getPolicy(self, state):
