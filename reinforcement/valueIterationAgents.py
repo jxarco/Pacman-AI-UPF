@@ -50,14 +50,16 @@ class ValueIterationAgent(ValueEstimationAgent):
 
           updatedValues = self.values.copy()
 
+          # For each state choose the max Qvalue
           for state in self.mdp.getStates():
             v_max = None
             for action in self.mdp.getPossibleActions(state):
-              v = self.computeQValueFromValues(state, action)
+              v = self.getQValue(state, action)
               v_max = max( v, v_max )
             if self.mdp.isTerminal(state):
               v_max = 0
 
+            # This contains the max Qvalues of each state
             updatedValues[state] = v_max
           self.values = updatedValues
 
@@ -81,6 +83,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Esta nos da el estado y la pa.
         states = self.mdp.getTransitionStatesAndProbs(state, action)
 
+        # Apply the Value iteration formula
         for nextState, pa in states:
           reward = self.mdp.getReward(state, action, nextState)
           Qvalue +=  pa * (reward + (self.discount * self.values[nextState]))
@@ -107,7 +110,7 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Choose the best action
 
-        Qvalues = [self.computeQValueFromValues(state, action) for action in actions]
+        Qvalues = [self.getQValue(state, action) for action in actions]
         bestQvalue = max(Qvalues)
         bestQIndex = [index for index in range(len(Qvalues)) if Qvalues[index] == bestQvalue]
 

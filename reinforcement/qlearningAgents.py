@@ -57,9 +57,11 @@ class QLearningAgent(ReinforcementAgent):
 
         node = (state, action)
 
+        # Should return 0.0 if we have never seen a state
         if node not in self.Qvalues:
           return 0.0
         
+        # Q node value
         return self.Qvalues[node]
 
         util.raiseNotDefined()
@@ -131,13 +133,18 @@ class QLearningAgent(ReinforcementAgent):
         legalActions = self.getLegalActions(state)
         "*** YOUR CODE HERE ***"
 
+        # Check if there is a legal action
         if len(legalActions) == 0:
           return None
 
+        # If the coin shows true, get a random action with 
+        # epsilon probability
         if util.flipCoin(self.epsilon):
           return random.choice(legalActions)
+
+        # If not, take the best action 
         else:
-          return self.computeActionFromQValues(state)
+          return self.getPolicy(state)
 
         util.raiseNotDefined()
 
@@ -153,13 +160,13 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         # QUESTION 4
 
-        #*********************************************************
+        #****************************************************************
         #*Q(s,a) = (1- alpha)*Q(s,a) + alpha[r(a,s) + disc * lmaxQ(s,a)]*
-        #*********************************************************
+        #****************************************************************
 
         node = (state, action)
 
-        self.Qvalues[node] = ( 1 - self.alpha ) * self.getQValue(state, action) + self.alpha * ( reward + self.discount * self.computeValueFromQValues(nextState))
+        self.Qvalues[node] = ( 1 - self.alpha ) * self.getQValue(state, action) + self.alpha * ( reward + self.discount * self.getValue(nextState))
 
 
     def getPolicy(self, state):

@@ -26,6 +26,7 @@ def question2():
     return answerDiscount, answerNoise
 
 def question3a():
+    # Prefer the closer exit
     answerDiscount = 0.05
     answerNoise = 0.0
     answerLivingReward = 0.75
@@ -33,13 +34,16 @@ def question3a():
     # If not possible, return 'NOT POSSIBLE'
 
 def question3b():
+    # Prefer the closer exit
     answerDiscount = 0.05
+    # Prefer avoiding the cliff
     answerNoise = 0.005
     answerLivingReward = 0.75
     return answerDiscount, answerNoise, answerLivingReward
     # If not possible, return 'NOT POSSIBLE'
 
 def question3c():
+    # Prefer the distant exit
     answerDiscount = 0.75
     answerNoise = 0.0
     answerLivingReward = 0.0
@@ -47,13 +51,16 @@ def question3c():
     # If not possible, return 'NOT POSSIBLE'
 
 def question3d():
+    # Prefer the distant exit
     answerDiscount = 0.75
+    # Prefer avoiding the cliff
     answerNoise = 0.1
     answerLivingReward = 0.3
     return answerDiscount, answerNoise, answerLivingReward
     # If not possible, return 'NOT POSSIBLE'
 
 def question3e():
+    # Avoid all
     answerDiscount = 1.0
     answerNoise = 0.0
     answerLivingReward = 1.0
@@ -61,6 +68,8 @@ def question3e():
     # If not possible, return 'NOT POSSIBLE'
 
 def question6():
+    # There is not any epsilon & learning rate to obtain the 
+    # optimum policy after 50 iterations
     answerEpsilon = None
     answerLearningRate = None
     return 'NOT POSSIBLE'
